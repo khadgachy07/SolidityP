@@ -1,0 +1,1 @@
+There smart contracts were already tested and deployed in Remix online IDE.
