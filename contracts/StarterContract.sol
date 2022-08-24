@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0
+// SPDX-License-Identifier: MIT
 
 pragma solidity ^0.8.0;
 
@@ -9,12 +9,12 @@ contract StarterContract{
     struct Person{
         uint age;
         string name;
-        address contract_address;
+        string contact_address;
     }
 
     bytes32[] public hashPerson;
 
-    Person[] public Creators;
+    Person[] Creators;
 
     mapping(bytes32 => Person) public personsHash;
 
@@ -34,31 +34,43 @@ contract StarterContract{
         _;
     }
 
-    function addCreator(uint _age, string memory _name, address _contractAddress) public checkBalance{
+    function addCreator(uint _age, string memory _name, string memory _contactAddress) public{
         Person memory person;
 
         person.age = _age;
         person.name = _name;
-        person.contract_address = _contractAddress;
+        person.contact_address = _contactAddress;
 
         Creators.push(person);
 
-        bytes32 hash = getHash(_age,_name,_contractAddress);
+        bytes32 hash = getHash(_age,_name,_contactAddress);
         hashPerson.push(hash);
         personsHash[hash] = person;
 
         namePerson[_name] = person;
     }
 
-    function getHash(uint _age, string memory _name, address _contactAddress) internal pure returns(bytes32) {
+    function getHash(uint _age, string memory _name, string memory _contactAddress) internal pure returns(bytes32) {
         return keccak256(abi.encode(_age, _name, _contactAddress));
     }
 
-    function getCretors() public view returns(Person[] memory){
+    function getCreators() public view returns(Person[] memory){
         return Creators;
     }
 
-    function getPerson(string memory _name) public view onlyOwner returns(Person memory){
+    function removePerson(uint index) public onlyOwner checkBalance{
+        for(uint i = index; i < Creators.length -1; i++){
+            Creators[i] = Creators[i+1];
+        }
+        Creators.pop();
+        
+        for (uint i = index; i < hashPerson.length - 1; i++){
+            hashPerson[i] = hashPerson[i+1];
+        }
+        hashPerson.pop();
+    }
+
+    function getPerson(string memory _name) public view onlyOwner checkBalance returns(Person memory){
        return namePerson[_name];
     }
 
